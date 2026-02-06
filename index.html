@@ -3,50 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Freddo Comex - Smart Dashboard</title>
+    <title>Freddo Comex - Operaciones & Tiempos</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-slate-50 min-h-screen font-sans">
+<body class="bg-slate-50 min-h-screen">
 
-    <nav class="bg-[#003366] text-white p-4 shadow-xl">
+    <nav class="bg-[#003366] text-white p-5 shadow-2xl mb-8">
         <div class="container mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-bold tracking-widest italic">FREDDO <span class="text-blue-400">LOGÍSTICA</span></h1>
-            <div class="flex gap-4 text-xl">
-                <i class="fas fa-ship" title="Marítimo"></i>
-                <i class="fas fa-truck" title="Terrestre"></i>
-                <i class="fas fa-plane" title="Aéreo"></i>
+            <div class="flex items-center gap-3">
+                <i class="fas fa-globe-americas text-2xl text-blue-400"></i>
+                <h1 class="text-xl font-bold tracking-tighter italic">FREDDO <span class="font-light">COMEX ANALYTICS</span></h1>
+            </div>
+            <div class="hidden md:flex gap-6 text-blue-200 uppercase text-xs font-bold">
+                <span><i class="fas fa-ship"></i> Marítimo</span>
+                <span><i class="fas fa-truck"></i> Terrestre</span>
+                <span><i class="fas fa-plane"></i> Aéreo</span>
             </div>
         </div>
     </nav>
 
-    <main class="container mx-auto p-4 lg:p-8 grid grid-cols-1 lg:grid-cols-4 gap-8">
+    <main class="container mx-auto px-4 grid grid-cols-1 lg:grid-cols-4 gap-8">
         
         <div class="lg:col-span-1">
-            <div class="bg-white p-6 rounded-3xl shadow-2xl border-b-8 border-blue-600">
-                <h2 class="text-[#003366] font-black uppercase text-sm mb-6 flex items-center gap-2">
-                    <i class="fas fa-file-invoice-dollar"></i> Cargar Flete
+            <div class="bg-white p-6 rounded-3xl shadow-xl border-t-8 border-blue-600">
+                <h2 class="text-[#003366] font-bold mb-6 flex items-center gap-2 uppercase text-sm">
+                    <i class="fas fa-plus-circle"></i> Nueva Cotización
                 </h2>
                 <form id="formComex" class="space-y-4">
-                    <input type="text" name="referencia" placeholder="Ref. Expo" class="w-full p-3 bg-gray-50 border-none rounded-xl text-sm outline-blue-500" required>
-                    <input type="text" name="destino" placeholder="Destino" class="w-full p-3 bg-gray-50 border-none rounded-xl text-sm outline-blue-500" required>
+                    <input type="text" name="referencia" placeholder="Ref. Expo" class="w-full p-3 bg-gray-50 border rounded-xl text-sm outline-blue-500" required>
+                    <input type="text" name="destino" placeholder="Puerto/Ciudad Destino" class="w-full p-3 bg-gray-50 border rounded-xl text-sm outline-blue-500" required>
                     
-                    <select name="modalidad" class="w-full p-3 bg-gray-50 border-none rounded-xl text-sm">
+                    <select name="modalidad" class="w-full p-3 bg-gray-50 border rounded-xl text-sm">
                         <option value="Marítimo">🚢 Marítimo</option>
                         <option value="Terrestre">🚛 Terrestre</option>
                         <option value="Aéreo">✈️ Aéreo</option>
                     </select>
 
-                    <input type="text" name="carrier" placeholder="Carrier / Naviera" class="w-full p-3 bg-gray-50 border-none rounded-xl text-sm" required>
+                    <input type="text" name="carrier" placeholder="Carrier / Línea" class="w-full p-3 bg-gray-50 border rounded-xl text-sm" required>
                     
-                    <div class="grid grid-cols-2 gap-2">
-                        <input type="number" name="flete" placeholder="Flete USD" class="p-3 bg-gray-50 border-none rounded-xl text-sm" required>
-                        <input type="number" name="gastos_locales" placeholder="Gastos USD" class="p-3 bg-gray-50 border-none rounded-xl text-sm" required>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Transit Time</label>
+                            <input type="number" name="transit_time" placeholder="Días" class="w-full p-3 bg-gray-50 border rounded-xl text-sm" required>
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-gray-400 uppercase ml-1">Flete USD</label>
+                            <input type="number" step="0.01" name="flete" placeholder="Monto" class="w-full p-3 bg-gray-50 border rounded-xl text-sm" required>
+                        </div>
                     </div>
+                    <input type="number" step="0.01" name="gastos_locales" placeholder="Gastos Locales USD" class="w-full p-3 bg-gray-50 border rounded-xl text-sm" required>
 
-                    <button type="submit" class="w-full bg-[#003366] text-white font-bold py-4 rounded-2xl hover:bg-blue-800 transition shadow-lg">
-                        GUARDAR Y ACTUALIZAR
+                    <button type="submit" id="btnSave" class="w-full bg-[#003366] text-white font-bold py-4 rounded-2xl hover:bg-blue-800 transition shadow-lg">
+                        GUARDAR EN HISTÓRICO
                     </button>
                 </form>
             </div>
@@ -54,39 +64,47 @@
 
         <div class="lg:col-span-3 space-y-8">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="bg-white p-6 rounded-3xl shadow-md flex items-center justify-between border-l-8 border-blue-500">
-                    <div>
-                        <p class="text-gray-400 text-xs font-bold uppercase">Promedio Flete</p>
-                        <h3 class="text-2xl font-black text-gray-800" id="kpiAvg">$0</h3>
+                <div class="bg-white p-6 rounded-3xl shadow-md border-l-8 border-blue-500">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-gray-400 text-[10px] font-bold uppercase tracking-widest">Promedio Flete</p>
+                            <h3 class="text-2xl font-black text-gray-800" id="kpiAvgFlete">$0.00</h3>
+                        </div>
+                        <i class="fas fa-hand-holding-dollar text-blue-100 text-4xl"></i>
                     </div>
-                    <i class="fas fa-chart-line text-blue-100 text-4xl"></i>
                 </div>
-                <div class="bg-white p-6 rounded-3xl shadow-md flex items-center justify-between border-l-8 border-green-500">
-                    <div>
-                        <p class="text-gray-400 text-xs font-bold uppercase">Operaciones</p>
-                        <h3 class="text-2xl font-black text-gray-800" id="kpiTotal">0</h3>
+
+                <div class="bg-white p-6 rounded-3xl shadow-md border-l-8 border-purple-500">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-gray-400 text-[10px] font-bold uppercase tracking-widest">Avg. Transit Time</p>
+                            <h3 class="text-2xl font-black text-gray-800" id="kpiAvgTime">0 Días</h3>
+                        </div>
+                        <i class="fas fa-clock text-purple-100 text-4xl"></i>
                     </div>
-                    <i class="fas fa-boxes-stacked text-green-100 text-4xl"></i>
                 </div>
-                <div class="bg-white p-6 rounded-3xl shadow-md flex items-center justify-between border-l-8 border-orange-500">
-                    <div>
-                        <p class="text-gray-400 text-xs font-bold uppercase">Eficiencia</p>
-                        <h3 class="text-2xl font-black text-gray-800">COMEX</h3>
+
+                <div class="bg-white p-6 rounded-3xl shadow-md border-l-8 border-green-500">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <p class="text-gray-400 text-[10px] font-bold uppercase tracking-widest">Total Registros</p>
+                            <h3 class="text-2xl font-black text-gray-800" id="kpiTotal">0</h3>
+                        </div>
+                        <i class="fas fa-database text-green-100 text-4xl"></i>
                     </div>
-                    <i class="fas fa-globe-americas text-orange-100 text-4xl"></i>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div class="bg-white p-6 rounded-3xl shadow-lg">
-                    <h4 class="text-gray-500 font-bold text-xs uppercase mb-6 tracking-widest flex items-center gap-2">
-                        <i class="fas fa-map-location-dot text-blue-500"></i> Costos por Destino
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 pb-10">
+                <div class="bg-white p-6 rounded-3xl shadow-lg border border-gray-100">
+                    <h4 class="text-gray-400 font-bold text-[10px] uppercase mb-6 flex items-center gap-2">
+                        <i class="fas fa-chart-bar text-blue-500"></i> Costos por Destino (Promedio USD)
                     </h4>
-                    <canvas id="mainChart"></canvas>
+                    <canvas id="barChart"></canvas>
                 </div>
-                <div class="bg-white p-6 rounded-3xl shadow-lg">
-                    <h4 class="text-gray-500 font-bold text-xs uppercase mb-6 tracking-widest flex items-center gap-2">
-                        <i class="fas fa-truck-fast text-blue-500"></i> Mix de Modalidad
+                <div class="bg-white p-6 rounded-3xl shadow-lg border border-gray-100">
+                    <h4 class="text-gray-400 font-bold text-[10px] uppercase mb-6 flex items-center gap-2">
+                        <i class="fas fa-chart-pie text-blue-500"></i> Distribución de Modalidades
                     </h4>
                     <canvas id="pieChart"></canvas>
                 </div>
@@ -95,55 +113,100 @@
     </main>
 
     <script>
-        const url = 'TU_URL_DE_APPS_SCRIPT_AQUI';
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxg3ZiHoRNF64b-y_yGe_FpVmyuA9uqt_yrutnMGxFKghy1eXPhz0GLpHIHXw7IJm01YA/exec';
 
-        // CARGAR DATOS REALES AL INICIAR
-        async function loadData() {
-            const res = await fetch(url);
-            const data = await res.json();
-            
-            const total = data.length;
-            const avg = data.reduce((acc, row) => acc + (row[8] || 0), 0) / total;
+        // CARGAR Y PROCESAR DATOS
+        async function updateDashboard() {
+            try {
+                const response = await fetch(SCRIPT_URL);
+                const data = await response.json();
+                
+                if (data.length === 0) return;
 
-            document.getElementById('kpiTotal').innerText = total;
-            document.getElementById('kpiAvg').innerText = '$' + avg.toFixed(2);
+                // Cálculos de KPIs
+                const total = data.length;
+                const totalFlete = data.reduce((acc, row) => acc + (parseFloat(row[8]) || 0), 0);
+                const totalTime = data.reduce((acc, row) => acc + (parseInt(row[7]) || 0), 0);
+                
+                document.getElementById('kpiTotal').innerText = total;
+                document.getElementById('kpiAvgFlete').innerText = '$' + (totalFlete / total).toFixed(2);
+                document.getElementById('kpiAvgTime').innerText = Math.round(totalTime / total) + ' Días';
 
-            // Actualizar Gráfico de Barras (Destinos)
-            const destinos = [...new Set(data.map(d => d[2]))];
-            const fletes = destinos.map(dest => {
-                const filtrados = data.filter(d => d[2] === dest);
-                return filtrados.reduce((acc, d) => acc + d[8], 0) / filtrados.length;
-            });
+                // Procesar datos para Bar Chart (Destinos)
+                const destinosMap = {};
+                data.forEach(row => {
+                    const dest = row[2];
+                    const costo = parseFloat(row[8]) || 0;
+                    if (!destinosMap[dest]) destinosMap[dest] = { suma: 0, count: 0 };
+                    destinosMap[dest].suma += costo;
+                    destinosMap[dest].count++;
+                });
 
-            new Chart(document.getElementById('mainChart'), {
+                const labelsDest = Object.keys(destinosMap);
+                const valuesDest = labelsDest.map(l => (destinosMap[l].suma / destinosMap[l].count).toFixed(0));
+
+                renderBarChart(labelsDest, valuesDest);
+
+                // Procesar datos para Pie Chart (Modalidades)
+                const modMap = { 'Marítimo': 0, 'Terrestre': 0, 'Aéreo': 0 };
+                data.forEach(row => {
+                    const mod = row[3];
+                    if (modMap.hasOwnProperty(mod)) modMap[mod]++;
+                });
+
+                renderPieChart(Object.keys(modMap), Object.values(modMap));
+
+            } catch (e) {
+                console.log("Cargando dashboard por primera vez...");
+            }
+        }
+
+        function renderBarChart(labels, values) {
+            new Chart(document.getElementById('barChart'), {
                 type: 'bar',
-                data: { labels: destinos, datasets: [{ label: 'Promedio USD', data: fletes, backgroundColor: '#3b82f6' }] }
-            });
-
-            // Actualizar Gráfico Circular (Modalidad)
-            const mods = ['Marítimo', 'Terrestre', 'Aéreo'];
-            const counts = mods.map(m => data.filter(d => d[3] === m).length);
-
-            new Chart(document.getElementById('pieChart'), {
-                type: 'doughnut',
-                data: { labels: mods, datasets: [{ data: counts, backgroundColor: ['#003366', '#3b82f6', '#93c5fd'] }] }
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Flete Promedio USD',
+                        data: values,
+                        backgroundColor: '#3b82f6',
+                        borderRadius: 8
+                    }]
+                }
             });
         }
 
-        // ENVIAR DATOS
+        function renderPieChart(labels, values) {
+            new Chart(document.getElementById('pieChart'), {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: values,
+                        backgroundColor: ['#003366', '#3b82f6', '#93c5fd'],
+                        borderWidth: 0
+                    }]
+                },
+                options: { cutout: '70%' }
+            });
+        }
+
+        // EVENTO DE ENVÍO
         document.getElementById('formComex').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btn = e.target.querySelector('button');
+            const btn = document.getElementById('btnSave');
             btn.disabled = true;
             btn.innerText = 'PROCESANDO...';
+
+            await fetch(SCRIPT_URL, { method: 'POST', body: new FormData(e.target) });
             
-            await fetch(url, { method: 'POST', body: new FormData(e.target) });
-            
-            alert('¡Cotización guardada!');
-            location.reload(); // Recarga para ver los nuevos gráficos
+            alert('¡Datos guardados! El dashboard se actualizará.');
+            location.reload(); 
         });
 
-        loadData();
+        // Iniciar
+        updateDashboard();
     </script>
 </body>
 </html>
+
