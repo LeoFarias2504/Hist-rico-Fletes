@@ -3,131 +3,134 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Freddo Argentina - Comex Dashboard</title>
+    <title>Freddo Comex - Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        .freddo-blue { background-color: #003366; }
-        .freddo-text { color: #003366; }
-    </style>
 </head>
-<body class="bg-slate-100 min-h-screen">
+<body class="bg-gray-100 min-h-screen">
 
-    <nav class="freddo-blue p-4 shadow-md mb-6">
-        <div class="container mx-auto flex justify-between items-center text-white">
-            <h1 class="font-bold text-xl uppercase tracking-tighter">Freddo Comex <span class="text-blue-300 font-light">| Analytics</span></h1>
+    <header class="bg-[#003366] text-white p-4 shadow-lg">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold tracking-tighter italic">FREDDO <span class="font-light text-blue-300">COMEX APP</span></h1>
+            <div class="text-xs text-right">
+                <p>Pasante: Control de Fletes</p>
+                <p class="opacity-70">Argentina</p>
+            </div>
         </div>
-    </nav>
+    </header>
 
-    <div class="container mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-6">
-        
-        <div class="lg:col-span-1">
-            <div class="bg-white shadow-xl rounded-2xl p-6 sticky top-6">
-                <h2 class="freddo-text font-bold mb-4 border-b pb-2 italic text-lg text-center">Cargar Cotización</h2>
-                <form id="comexForm" class="space-y-3">
-                    <input type="text" name="referencia" placeholder="Ref. Expo" class="w-full border p-2 rounded text-sm outline-none focus:border-blue-500" required>
-                    <input type="text" name="destino" placeholder="Destino (Ej: Callao)" class="w-full border p-2 rounded text-sm outline-none" required>
-                    <select name="modalidad" class="w-full border p-2 rounded text-sm outline-none">
+    <main class="container mx-auto p-4 md:p-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <div class="lg:col-span-1 bg-white p-6 rounded-2xl shadow-xl border-t-4 border-[#003366]">
+                <h2 class="text-[#003366] font-bold text-lg mb-4 flex items-center">
+                    📝 Nueva Cotización
+                </h2>
+                <form id="quoteForm" class="space-y-4">
+                    <input type="text" name="referencia" placeholder="Ref. Expo (Ej: EXP-101)" class="w-full p-2 border rounded shadow-sm focus:outline-blue-500" required>
+                    <input type="text" name="destino" placeholder="Destino (Ej: Chile)" class="w-full p-2 border rounded shadow-sm focus:outline-blue-500" required>
+                    
+                    <select name="modalidad" class="w-full p-2 border rounded shadow-sm bg-gray-50">
                         <option>Marítimo</option>
                         <option>Terrestre</option>
                         <option>Aéreo</option>
                     </select>
-                    <input type="text" name="incoterm" placeholder="Incoterm" class="w-full border p-2 rounded text-sm">
-                    <input type="text" name="carrier" placeholder="Naviera / Carrier" class="w-full border p-2 rounded text-sm" required>
+
+                    <input type="text" name="carrier" placeholder="Naviera / Transportista" class="w-full p-2 border rounded shadow-sm" required>
+                    
                     <div class="grid grid-cols-2 gap-2">
-                        <input type="number" name="flete" placeholder="Flete (USD)" class="border p-2 rounded text-sm" required>
-                        <input type="number" name="gastos_locales" placeholder="Gastos (USD)" class="border p-2 rounded text-sm" required>
+                        <input type="number" name="flete" placeholder="Flete USD" class="p-2 border rounded shadow-sm" required>
+                        <input type="number" name="gastos_locales" placeholder="Gastos USD" class="p-2 border rounded shadow-sm" required>
                     </div>
-                    <button type="submit" id="btnEnviar" class="w-full freddo-blue text-white font-bold py-3 rounded-lg hover:opacity-90 transition shadow-md">
-                        REGISTRAR
+
+                    <button type="submit" id="btnSubmit" class="w-full bg-[#003366] text-white font-bold py-3 rounded-xl hover:bg-blue-900 transition-all shadow-md">
+                        GUARDAR DATOS
                     </button>
                 </form>
-                <p id="msg" class="hidden mt-2 text-green-600 text-xs text-center font-bold italic text-blue-500">¡Guardado con éxito!</p>
-            </div>
-        </div>
-
-        <div class="lg:col-span-2 space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="bg-white p-6 rounded-2xl shadow-md border-l-4 border-blue-500">
-                    <p class="text-gray-500 text-xs uppercase font-bold tracking-widest">Flete Promedio</p>
-                    <h3 class="text-3xl font-bold freddo-text" id="avgFlete">USD 0</h3>
-                </div>
-                <div class="bg-white p-6 rounded-2xl shadow-md border-l-4 border-cyan-500">
-                    <p class="text-gray-500 text-xs uppercase font-bold tracking-widest">Total Registros</p>
-                    <h3 class="text-3xl font-bold freddo-text" id="totalReg">0</h3>
-                </div>
+                <p id="statusMsg" class="hidden mt-4 text-center font-bold text-green-600 animate-pulse">¡Registrado con éxito!</p>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-white p-4 rounded-2xl shadow-md">
-                    <h4 class="text-gray-700 font-bold mb-4 text-sm uppercase">Promedio por Destino</h4>
-                    <canvas id="barChart"></canvas>
+            <div class="lg:col-span-2 space-y-6">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-blue-50 p-6 rounded-2xl border border-blue-100 shadow-sm">
+                        <p class="text-blue-800 text-xs font-bold uppercase">Promedio Regional</p>
+                        <h3 class="text-3xl font-black text-[#003366]" id="kpiAvg">USD 1.450</h3>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                        <p class="text-gray-500 text-xs font-bold uppercase">Total Operaciones</p>
+                        <h3 class="text-3xl font-black text-gray-800" id="kpiTotal">12</h3>
+                    </div>
                 </div>
-                <div class="bg-white p-4 rounded-2xl shadow-md">
-                    <h4 class="text-gray-700 font-bold mb-4 text-sm uppercase">Mix de Modalidad</h4>
-                    <canvas id="pieChart"></canvas>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                        <h4 class="text-xs font-bold text-gray-400 mb-4 uppercase text-center">Costos por Destino</h4>
+                        <canvas id="chartBarras"></canvas>
+                    </div>
+                    <div class="bg-white p-4 rounded-2xl shadow-sm border border-gray-100">
+                        <h4 class="text-xs font-bold text-gray-400 mb-4 uppercase text-center">Mix de Transporte</h4>
+                        <canvas id="chartTorta"></canvas>
+                    </div>
                 </div>
             </div>
+
         </div>
-    </div>
+    </main>
 
     <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbxg3ZiHoRNF64b-y_yGe_FpVmyuA9uqt_yrutnMGxFKghy1eXPhz0GLpHIHXw7IJm01YA/exec';
-        const form = document.getElementById('comexForm');
+        // URL DE TU GOOGLE SCRIPT
+        const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbxg3ZiHoRNF64b-y_yGe_FpVmyuA9uqt_yrutnMGxFKghy1eXPhz0GLpHIHXw7IJm01YA/exec';
         
-        // --- FUNCIÓN PARA GUARDAR ---
+        const form = document.getElementById('quoteForm');
+        const btn = document.getElementById('btnSubmit');
+        const status = document.getElementById('statusMsg');
+
         form.addEventListener('submit', e => {
             e.preventDefault();
-            const btn = document.getElementById('btnEnviar');
             btn.disabled = true;
-            btn.innerText = 'GUARDANDO...';
+            btn.innerText = 'ENVIANDO...';
 
-            fetch(scriptURL, { method: 'POST', body: new FormData(form)})
-                .then(response => {
-                    document.getElementById('msg').classList.remove('hidden');
-                    form.reset();
-                    btn.disabled = false;
-                    btn.innerText = 'REGISTRAR';
-                    setTimeout(() => document.getElementById('msg').classList.add('hidden'), 3000);
-                    // Aquí podrías recargar datos si tuvieras un GET configurado
-                })
-                .catch(error => alert('Error: ' + error.message));
+            fetch(SCRIPT_URL, { method: 'POST', body: new FormData(form) })
+            .then(res => {
+                status.classList.remove('hidden');
+                form.reset();
+                btn.disabled = false;
+                btn.innerText = 'GUARDAR DATOS';
+                setTimeout(() => status.classList.add('hidden'), 4000);
+            })
+            .catch(err => {
+                alert('Error al conectar con Google Sheets');
+                btn.disabled = false;
+                btn.innerText = 'REINTENTAR';
+            });
         });
 
-        // --- DASHBOARD (SIMULACIÓN DE DATOS) ---
-        // Para que sea 100% automático, el Script de Google debería tener una función GET.
-        // Mientras tanto, te muestro cómo se renderiza un Dashboard de alto nivel:
-        
-        const ctxBar = document.getElementById('barChart');
+        // Configuración de Gráficos (Datos iniciales para que no se vea vacío)
+        const ctxBar = document.getElementById('chartBarras').getContext('2d');
         new Chart(ctxBar, {
             type: 'bar',
             data: {
-                labels: ['Brasil', 'Chile', 'Perú', 'Uruguay'],
+                labels: ['Chile', 'Uruguay', 'Brasil', 'Perú'],
                 datasets: [{
-                    label: 'Costo Promedio (USD)',
-                    data: [1200, 950, 2100, 800],
-                    backgroundColor: '#003366'
+                    label: 'Flete USD',
+                    data: [850, 600, 1200, 2100],
+                    backgroundColor: '#003366',
+                    borderRadius: 5
                 }]
-            },
-            options: { responsive: true }
+            }
         });
 
-        const ctxPie = document.getElementById('pieChart');
+        const ctxPie = document.getElementById('chartTorta').getContext('2d');
         new Chart(ctxPie, {
             type: 'doughnut',
             data: {
                 labels: ['Marítimo', 'Terrestre', 'Aéreo'],
                 datasets: [{
-                    data: [60, 30, 10],
+                    data: [70, 20, 10],
                     backgroundColor: ['#003366', '#3b82f6', '#93c5fd']
                 }]
-            },
-            options: { responsive: true }
+            }
         });
-
-        // Mock de KPIs
-        document.getElementById('avgFlete').innerText = 'USD 1.512';
-        document.getElementById('totalReg').innerText = '24';
     </script>
 </body>
 </html>
