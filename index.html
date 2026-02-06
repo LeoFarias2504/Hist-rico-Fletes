@@ -3,131 +3,147 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Freddo Argentina - Comex Dashboard</title>
+    <title>Freddo Comex - Smart Dashboard</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        .freddo-blue { background-color: #003366; }
-        .freddo-text { color: #003366; }
-    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
-<body class="bg-slate-100 min-h-screen">
+<body class="bg-slate-50 min-h-screen font-sans">
 
-    <nav class="freddo-blue p-4 shadow-md mb-6">
-        <div class="container mx-auto flex justify-between items-center text-white">
-            <h1 class="font-bold text-xl uppercase tracking-tighter">Freddo Comex <span class="text-blue-300 font-light">| Analytics</span></h1>
+    <nav class="bg-[#003366] text-white p-4 shadow-xl">
+        <div class="container mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold tracking-widest italic">FREDDO <span class="text-blue-400">LOGÍSTICA</span></h1>
+            <div class="flex gap-4 text-xl">
+                <i class="fas fa-ship" title="Marítimo"></i>
+                <i class="fas fa-truck" title="Terrestre"></i>
+                <i class="fas fa-plane" title="Aéreo"></i>
+            </div>
         </div>
     </nav>
 
-    <div class="container mx-auto px-4 grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <main class="container mx-auto p-4 lg:p-8 grid grid-cols-1 lg:grid-cols-4 gap-8">
         
         <div class="lg:col-span-1">
-            <div class="bg-white shadow-xl rounded-2xl p-6 sticky top-6">
-                <h2 class="freddo-text font-bold mb-4 border-b pb-2 italic text-lg text-center">Cargar Cotización</h2>
-                <form id="comexForm" class="space-y-3">
-                    <input type="text" name="referencia" placeholder="Ref. Expo" class="w-full border p-2 rounded text-sm outline-none focus:border-blue-500" required>
-                    <input type="text" name="destino" placeholder="Destino (Ej: Callao)" class="w-full border p-2 rounded text-sm outline-none" required>
-                    <select name="modalidad" class="w-full border p-2 rounded text-sm outline-none">
-                        <option>Marítimo</option>
-                        <option>Terrestre</option>
-                        <option>Aéreo</option>
+            <div class="bg-white p-6 rounded-3xl shadow-2xl border-b-8 border-blue-600">
+                <h2 class="text-[#003366] font-black uppercase text-sm mb-6 flex items-center gap-2">
+                    <i class="fas fa-file-invoice-dollar"></i> Cargar Flete
+                </h2>
+                <form id="formComex" class="space-y-4">
+                    <input type="text" name="referencia" placeholder="Ref. Expo" class="w-full p-3 bg-gray-50 border-none rounded-xl text-sm outline-blue-500" required>
+                    <input type="text" name="destino" placeholder="Destino" class="w-full p-3 bg-gray-50 border-none rounded-xl text-sm outline-blue-500" required>
+                    
+                    <select name="modalidad" class="w-full p-3 bg-gray-50 border-none rounded-xl text-sm">
+                        <option value="Marítimo">🚢 Marítimo</option>
+                        <option value="Terrestre">🚛 Terrestre</option>
+                        <option value="Aéreo">✈️ Aéreo</option>
                     </select>
-                    <input type="text" name="incoterm" placeholder="Incoterm" class="w-full border p-2 rounded text-sm">
-                    <input type="text" name="carrier" placeholder="Naviera / Carrier" class="w-full border p-2 rounded text-sm" required>
+
+                    <input type="text" name="carrier" placeholder="Carrier / Naviera" class="w-full p-3 bg-gray-50 border-none rounded-xl text-sm" required>
+                    
                     <div class="grid grid-cols-2 gap-2">
-                        <input type="number" name="flete" placeholder="Flete (USD)" class="border p-2 rounded text-sm" required>
-                        <input type="number" name="gastos_locales" placeholder="Gastos (USD)" class="border p-2 rounded text-sm" required>
+                        <input type="number" name="flete" placeholder="Flete USD" class="p-3 bg-gray-50 border-none rounded-xl text-sm" required>
+                        <input type="number" name="gastos_locales" placeholder="Gastos USD" class="p-3 bg-gray-50 border-none rounded-xl text-sm" required>
                     </div>
-                    <button type="submit" id="btnEnviar" class="w-full freddo-blue text-white font-bold py-3 rounded-lg hover:opacity-90 transition shadow-md">
-                        REGISTRAR
+
+                    <button type="submit" class="w-full bg-[#003366] text-white font-bold py-4 rounded-2xl hover:bg-blue-800 transition shadow-lg">
+                        GUARDAR Y ACTUALIZAR
                     </button>
                 </form>
-                <p id="msg" class="hidden mt-2 text-green-600 text-xs text-center font-bold italic text-blue-500">¡Guardado con éxito!</p>
             </div>
         </div>
 
-        <div class="lg:col-span-2 space-y-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div class="bg-white p-6 rounded-2xl shadow-md border-l-4 border-blue-500">
-                    <p class="text-gray-500 text-xs uppercase font-bold tracking-widest">Flete Promedio</p>
-                    <h3 class="text-3xl font-bold freddo-text" id="avgFlete">USD 0</h3>
+        <div class="lg:col-span-3 space-y-8">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white p-6 rounded-3xl shadow-md flex items-center justify-between border-l-8 border-blue-500">
+                    <div>
+                        <p class="text-gray-400 text-xs font-bold uppercase">Promedio Flete</p>
+                        <h3 class="text-2xl font-black text-gray-800" id="kpiAvg">$0</h3>
+                    </div>
+                    <i class="fas fa-chart-line text-blue-100 text-4xl"></i>
                 </div>
-                <div class="bg-white p-6 rounded-2xl shadow-md border-l-4 border-cyan-500">
-                    <p class="text-gray-500 text-xs uppercase font-bold tracking-widest">Total Registros</p>
-                    <h3 class="text-3xl font-bold freddo-text" id="totalReg">0</h3>
+                <div class="bg-white p-6 rounded-3xl shadow-md flex items-center justify-between border-l-8 border-green-500">
+                    <div>
+                        <p class="text-gray-400 text-xs font-bold uppercase">Operaciones</p>
+                        <h3 class="text-2xl font-black text-gray-800" id="kpiTotal">0</h3>
+                    </div>
+                    <i class="fas fa-boxes-stacked text-green-100 text-4xl"></i>
+                </div>
+                <div class="bg-white p-6 rounded-3xl shadow-md flex items-center justify-between border-l-8 border-orange-500">
+                    <div>
+                        <p class="text-gray-400 text-xs font-bold uppercase">Eficiencia</p>
+                        <h3 class="text-2xl font-black text-gray-800">COMEX</h3>
+                    </div>
+                    <i class="fas fa-globe-americas text-orange-100 text-4xl"></i>
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-white p-4 rounded-2xl shadow-md">
-                    <h4 class="text-gray-700 font-bold mb-4 text-sm uppercase">Promedio por Destino</h4>
-                    <canvas id="barChart"></canvas>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="bg-white p-6 rounded-3xl shadow-lg">
+                    <h4 class="text-gray-500 font-bold text-xs uppercase mb-6 tracking-widest flex items-center gap-2">
+                        <i class="fas fa-map-location-dot text-blue-500"></i> Costos por Destino
+                    </h4>
+                    <canvas id="mainChart"></canvas>
                 </div>
-                <div class="bg-white p-4 rounded-2xl shadow-md">
-                    <h4 class="text-gray-700 font-bold mb-4 text-sm uppercase">Mix de Modalidad</h4>
+                <div class="bg-white p-6 rounded-3xl shadow-lg">
+                    <h4 class="text-gray-500 font-bold text-xs uppercase mb-6 tracking-widest flex items-center gap-2">
+                        <i class="fas fa-truck-fast text-blue-500"></i> Mix de Modalidad
+                    </h4>
                     <canvas id="pieChart"></canvas>
                 </div>
             </div>
         </div>
-    </div>
+    </main>
 
     <script>
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbxg3ZiHoRNF64b-y_yGe_FpVmyuA9uqt_yrutnMGxFKghy1eXPhz0GLpHIHXw7IJm01YA/exec';
-        const form = document.getElementById('comexForm');
-        
-        // --- FUNCIÓN PARA GUARDAR ---
-        form.addEventListener('submit', e => {
+        const url = 'TU_URL_DE_APPS_SCRIPT_AQUI';
+
+        // CARGAR DATOS REALES AL INICIAR
+        async function loadData() {
+            const res = await fetch(url);
+            const data = await res.json();
+            
+            const total = data.length;
+            const avg = data.reduce((acc, row) => acc + (row[8] || 0), 0) / total;
+
+            document.getElementById('kpiTotal').innerText = total;
+            document.getElementById('kpiAvg').innerText = '$' + avg.toFixed(2);
+
+            // Actualizar Gráfico de Barras (Destinos)
+            const destinos = [...new Set(data.map(d => d[2]))];
+            const fletes = destinos.map(dest => {
+                const filtrados = data.filter(d => d[2] === dest);
+                return filtrados.reduce((acc, d) => acc + d[8], 0) / filtrados.length;
+            });
+
+            new Chart(document.getElementById('mainChart'), {
+                type: 'bar',
+                data: { labels: destinos, datasets: [{ label: 'Promedio USD', data: fletes, backgroundColor: '#3b82f6' }] }
+            });
+
+            // Actualizar Gráfico Circular (Modalidad)
+            const mods = ['Marítimo', 'Terrestre', 'Aéreo'];
+            const counts = mods.map(m => data.filter(d => d[3] === m).length);
+
+            new Chart(document.getElementById('pieChart'), {
+                type: 'doughnut',
+                data: { labels: mods, datasets: [{ data: counts, backgroundColor: ['#003366', '#3b82f6', '#93c5fd'] }] }
+            });
+        }
+
+        // ENVIAR DATOS
+        document.getElementById('formComex').addEventListener('submit', async (e) => {
             e.preventDefault();
-            const btn = document.getElementById('btnEnviar');
+            const btn = e.target.querySelector('button');
             btn.disabled = true;
-            btn.innerText = 'GUARDANDO...';
-
-            fetch(scriptURL, { method: 'POST', body: new FormData(form)})
-                .then(response => {
-                    document.getElementById('msg').classList.remove('hidden');
-                    form.reset();
-                    btn.disabled = false;
-                    btn.innerText = 'REGISTRAR';
-                    setTimeout(() => document.getElementById('msg').classList.add('hidden'), 3000);
-                    // Aquí podrías recargar datos si tuvieras un GET configurado
-                })
-                .catch(error => alert('Error: ' + error.message));
+            btn.innerText = 'PROCESANDO...';
+            
+            await fetch(url, { method: 'POST', body: new FormData(e.target) });
+            
+            alert('¡Cotización guardada!');
+            location.reload(); // Recarga para ver los nuevos gráficos
         });
 
-        // --- DASHBOARD (SIMULACIÓN DE DATOS) ---
-        // Para que sea 100% automático, el Script de Google debería tener una función GET.
-        // Mientras tanto, te muestro cómo se renderiza un Dashboard de alto nivel:
-        
-        const ctxBar = document.getElementById('barChart');
-        new Chart(ctxBar, {
-            type: 'bar',
-            data: {
-                labels: ['Brasil', 'Chile', 'Perú', 'Uruguay'],
-                datasets: [{
-                    label: 'Costo Promedio (USD)',
-                    data: [1200, 950, 2100, 800],
-                    backgroundColor: '#003366'
-                }]
-            },
-            options: { responsive: true }
-        });
-
-        const ctxPie = document.getElementById('pieChart');
-        new Chart(ctxPie, {
-            type: 'doughnut',
-            data: {
-                labels: ['Marítimo', 'Terrestre', 'Aéreo'],
-                datasets: [{
-                    data: [60, 30, 10],
-                    backgroundColor: ['#003366', '#3b82f6', '#93c5fd']
-                }]
-            },
-            options: { responsive: true }
-        });
-
-        // Mock de KPIs
-        document.getElementById('avgFlete').innerText = 'USD 1.512';
-        document.getElementById('totalReg').innerText = '24';
+        loadData();
     </script>
 </body>
 </html>
